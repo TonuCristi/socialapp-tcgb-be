@@ -17,6 +17,12 @@ async function register(req: Request, res: Response) {
       throw new Error("The username shouldn't have more than 30 characters!");
     }
 
+    const foundUserByUsername = await User.findOne({ username });
+
+    if (foundUserByUsername) {
+      throw new Error("This username is already taken!");
+    }
+
     // Email validation
     if (!email) {
       throw new Error("The email field is required!");
@@ -26,6 +32,12 @@ async function register(req: Request, res: Response) {
       throw new Error("Invalid email!");
     }
 
+    const foundUserByEmail = await User.findOne({ email });
+
+    if (foundUserByEmail) {
+      throw new Error("This email is already registered!");
+    }
+
     // Password validation
     if (!password) {
       throw new Error("The password field is required!");
@@ -33,20 +45,6 @@ async function register(req: Request, res: Response) {
 
     if (!isStrongPassword(password)) {
       throw new Error("Password not strong enough!");
-    }
-
-    // Check if the username is taken
-    const foundUserByUsername = await User.findOne({ username });
-
-    if (foundUserByUsername) {
-      throw new Error("This username is already taken!");
-    }
-
-    // Check if user exists
-    const foundUserByEmail = await User.findOne({ email });
-
-    if (foundUserByEmail) {
-      throw new Error("This email is already registered!");
     }
 
     // Password hash
