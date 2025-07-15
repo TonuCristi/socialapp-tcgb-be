@@ -1,17 +1,10 @@
-import config from "@/config/config";
 import User from "@/models/user.model";
+import { verifyJWT } from "@/utils/verifyJWT";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 
 async function getLoggedUser(req: Request, res: Response) {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-
-    const decoded = jwt.verify(token as string, config.JWT_SECRET as string);
-
-    if (!(decoded && typeof decoded !== "string")) {
-      throw new Error("Invalid JWT!");
-    }
+    const decoded = verifyJWT(req);
 
     const userId = decoded.id;
     const foundUser = await User.findById(userId).select(
