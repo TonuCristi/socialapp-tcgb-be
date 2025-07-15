@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authRoutes from "./auth.route";
 import userRoutes from "./user.route";
+import { authMiddleware } from "@/middleware/authMiddleware";
 
 const router = Router();
 
@@ -14,6 +15,8 @@ router.get("/", (req, res) => {
 });
 
 router.use("/auth", authRoutes);
+
+router.use(authMiddleware);
 
 router.use("/user", userRoutes);
 
