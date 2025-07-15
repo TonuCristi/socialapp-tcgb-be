@@ -26,7 +26,7 @@ async function login(req: Request, res: Response) {
 
     // Check if user exists
     if (!foundUserByEmail) {
-      throw new Error("User not found!");
+      throw new Error("The email or password you entered is incorrect!");
     }
 
     const isPasswordChecked = bcrypt.compareSync(
