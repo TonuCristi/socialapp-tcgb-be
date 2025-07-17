@@ -74,6 +74,7 @@ async function editUser(req: Request, res: Response) {
 
     res.status(201).json({
       editedUser,
+      message: "Profile edited successfully!",
     });
   } catch (error) {
     if (error instanceof Error) {
