@@ -8,6 +8,7 @@ import limiter from "./lib/express_rate_limit";
 import config from "./config/config";
 import v1Routes from "./routes/v1/v1.route";
 import { connectToDatabase, disconnectFromDatabase } from "./lib/mongoose";
+import multer from "multer";
 
 const app = express();
 
@@ -38,6 +39,8 @@ app.use(compression({ threshold: 1024 }));
 app.use(helmet());
 
 app.use(limiter);
+
+export const storage = multer.memoryStorage();
 
 (async () => {
   try {
