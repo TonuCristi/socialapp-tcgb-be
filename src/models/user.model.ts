@@ -1,13 +1,13 @@
-import mongoose, { model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 export type User = {
-  username: String;
-  email: String;
+  username: string;
+  email: string;
   birthDate: Date | "";
-  password: String;
-  bio: String;
-  phoneNumber: String;
-  avatar: String;
+  password: string;
+  bio: string;
+  phoneNumber: string;
+  avatar: string;
 };
 
 const userSchema = new Schema<User>(
