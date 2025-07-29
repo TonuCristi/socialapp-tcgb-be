@@ -1,9 +1,16 @@
+import { supabase } from "@/config/supabase";
 import Post from "@/models/post.model";
 import PostPhoto from "@/models/postPhoto.model";
+import User from "@/models/user.model";
+import { verifyJWT } from "@/utils/verifyJWT";
 import { Request, Response } from "express";
 
 async function createPost(req: Request, res: Response) {
   try {
+    const decoded = verifyJWT(req);
+
+    const userId = decoded.id;
+
     const content = req.body.content;
     const order = JSON.parse(req.body.order);
     const photos = req.files as Express.Multer.File[];
@@ -27,8 +34,11 @@ async function createPost(req: Request, res: Response) {
     const photosMimeType = photos.map((photo) => photo.mimetype);
 
     if (
-      !photosMimeType.includes("image/png") ||
-      !photosMimeType.includes("image/jpeg")
+      photos.length &&
+      !(
+        photosMimeType.includes("image/png") ||
+        photosMimeType.includes("image/jpeg")
+      )
     ) {
       throw new Error("Each file must be PNG or JPEG!");
     }
@@ -37,7 +47,11 @@ async function createPost(req: Request, res: Response) {
       throw new Error("Each file must be between 10KB and 5MB in size!");
     }
 
-    await Post.create({ content });
+    const createdPost = await Post.create({ content, userId });
+
+    console.log(createdPost);
+
+    const photosWithOrder = [];
 
     for (let i = 0; i < photos.length; i++) {
       const foundPhoto = order.find(
@@ -45,13 +59,46 @@ async function createPost(req: Request, res: Response) {
           photos[i].originalname === orderItem.photoName
       );
 
-      await PostPhoto.create({
+      const { data, error } = await supabase.storage
+        .from("photos")
+        .upload(`postsPhotos/${createdPost.id}-${i + 1}`, photos[i].buffer, {
+          contentType: photos[i].mimetype,
+          upsert: false,
+        });
+      if (error) {
+        throw new Error("Something went wrong!");
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("photos").getPublicUrl(data.path, {
+        transform: {
+          width: 1920,
+          height: 1080,
+          quality: 70,
+        },
+      });
+
+      const photo = await PostPhoto.create({
         index: foundPhoto.index,
-        photo: photos[i].buffer,
+        photo: `${publicUrl}`,
+        postId: createdPost.id,
+      });
+
+      photosWithOrder.push({
+        _id: photo.id,
+        photo: photo.photo,
+        index: photo.index,
       });
     }
 
     res.status(201).json({
+      newPost: {
+        _id: createdPost.id,
+        content: createdPost.content,
+        photos: photosWithOrder,
+        createdAt: createdPost.createdAt,
+      },
       message: "Post created successfully!",
     });
   } catch (error) {

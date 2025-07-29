@@ -40,8 +40,6 @@ app.use(helmet());
 
 app.use(limiter);
 
-export const storage = multer.memoryStorage();
-
 (async () => {
   try {
     await connectToDatabase();

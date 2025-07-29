@@ -1,12 +1,15 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 export type Post = {
-  content: String;
+  content: string;
+  userId: Types.ObjectId;
+  createdAt: string;
 };
 
 const postSchema = new Schema<Post>(
   {
     content: { type: String, default: "" },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

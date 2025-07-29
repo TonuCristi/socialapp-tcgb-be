@@ -1,14 +1,16 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 export type PostPhoto = {
-  photo: Buffer;
+  photo: string;
   index: number;
+  postId: Types.ObjectId;
 };
 
 const postPhotoSchema = new Schema<PostPhoto>(
   {
-    photo: Buffer,
+    photo: String,
     index: Number,
+    postId: { type: Schema.Types.ObjectId, ref: "Post" },
   },
   { timestamps: true }
 );

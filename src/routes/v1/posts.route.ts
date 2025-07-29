@@ -10,6 +10,6 @@ const upload = multer({ storage });
 
 router.post("/create-post", upload.array("photos"), createPost);
 
-router.post("/get-posts", getPosts);
+router.get("/get-posts", getPosts);
 
 export default router;
