@@ -11,6 +11,12 @@ async function createPost(req: Request, res: Response) {
 
     const userId = decoded.id;
 
+    const postCreator = await User.findById(userId);
+
+    if (!postCreator) {
+      throw new Error("User not found!");
+    }
+
     const content = req.body.content;
     const order = JSON.parse(req.body.order);
     const photos = req.files as Express.Multer.File[];
@@ -22,8 +28,8 @@ async function createPost(req: Request, res: Response) {
     }
 
     // Content validation
-    if (content && content.length > 500) {
-      throw new Error("The content shouldn't have more than 500 characters!");
+    if (content && content.length > 2000) {
+      throw new Error("The content shouldn't have more than 2000 characters!");
     }
 
     // Photos validation
@@ -49,8 +55,6 @@ async function createPost(req: Request, res: Response) {
 
     const createdPost = await Post.create({ content, userId });
 
-    console.log(createdPost);
-
     const photosWithOrder = [];
 
     for (let i = 0; i < photos.length; i++) {
@@ -65,6 +69,7 @@ async function createPost(req: Request, res: Response) {
           contentType: photos[i].mimetype,
           upsert: false,
         });
+
       if (error) {
         throw new Error("Something went wrong!");
       }
@@ -73,9 +78,7 @@ async function createPost(req: Request, res: Response) {
         data: { publicUrl },
       } = supabase.storage.from("photos").getPublicUrl(data.path, {
         transform: {
-          width: 1920,
-          height: 1080,
-          quality: 70,
+          quality: 60,
         },
       });
 
@@ -97,6 +100,9 @@ async function createPost(req: Request, res: Response) {
         _id: createdPost.id,
         content: createdPost.content,
         photos: photosWithOrder,
+        likesCount: 0,
+        commentsCount: 0,
+        creatorName: postCreator.username,
         createdAt: createdPost.createdAt,
       },
       message: "Post created successfully!",
