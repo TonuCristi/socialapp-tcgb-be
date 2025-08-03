@@ -23,9 +23,15 @@ async function getUsers(req: Request, res: Response) {
         "-email -birthDate -password -bio -phoneNumber -createdAt -updatedAt -__v"
       );
 
+    const postsCount = await User.countDocuments({
+      username: { $regex: search, $options: "i" },
+      _id: { $ne: userId },
+    });
+    const maxPages = Math.ceil(postsCount / limit);
+
     res.status(200).json({
       users: foundUsers,
-      nextPage: offset + 1,
+      nextPage: maxPages - 1 > offset ? offset + 1 : null,
     });
   } catch (error) {
     if (error instanceof Error) {

@@ -38,7 +38,7 @@ app.use(compression({ threshold: 1024 }));
 
 app.use(helmet());
 
-app.use(limiter);
+// app.use(limiter);
 
 (async () => {
   try {

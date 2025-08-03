@@ -1,7 +1,7 @@
 import { Router } from "express";
 import createPost from "@/controllers/v1/posts/createPost";
 import multer from "multer";
-import getPosts from "@/controllers/v1/posts/getPosts";
+import getUserPosts from "@/controllers/v1/posts/getUserPosts";
 
 const router = Router();
 
@@ -10,6 +10,6 @@ const upload = multer({ storage });
 
 router.post("/create-post", upload.array("photos"), createPost);
 
-router.get("/get-posts", getPosts);
+router.get("/get-user-posts", getUserPosts);
 
 export default router;
