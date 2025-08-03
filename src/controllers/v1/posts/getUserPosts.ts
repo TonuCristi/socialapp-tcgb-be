@@ -50,6 +50,10 @@ async function getUserPosts(req: Request, res: Response) {
 
       const likesCount = await Like.countDocuments({ postId: post._id });
       const commentsCount = await Comment.countDocuments({ postId: post._id });
+      const foundLike = await Like.findOne({
+        postId: post.id,
+        userId: post.userId,
+      });
 
       const postPhotos = photos.map((photoItem) => ({
         _id: photoItem._id,
@@ -64,6 +68,7 @@ async function getUserPosts(req: Request, res: Response) {
         likesCount,
         commentsCount,
         creatorName: postCreator.username,
+        isLikedByMe: foundLike ? true : false,
         createdAt: post.createdAt,
       };
 
