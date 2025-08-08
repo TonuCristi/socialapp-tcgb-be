@@ -37,7 +37,11 @@ async function likePost(req: Request, res: Response) {
       });
     }
 
-    await Like.create({ postId: foundPost.id, userId: postCreator.id });
+    await Like.create({
+      type: "post",
+      postId: foundPost.id,
+      userId: postCreator.id,
+    });
 
     res.status(200).json({
       message: "Post liked successfully!",
