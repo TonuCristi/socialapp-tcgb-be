@@ -6,6 +6,7 @@ import likePost from "@/controllers/v1/posts/likePost";
 import getPostLikes from "@/controllers/v1/posts/getPostLikes";
 import addPostComment from "@/controllers/v1/posts/addPostComment";
 import getPostComments from "@/controllers/v1/posts/getPostComments";
+import deletePost from "@/controllers/v1/posts/deletePost";
 
 const router = Router();
 
@@ -13,6 +14,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post("/create-post", upload.array("photos"), createPost);
+
+router.delete("/delete-post/:postId", deletePost);
 
 router.get("/get-user-posts", getUserPosts);
 
